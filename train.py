@@ -3,12 +3,14 @@ import torch
 from data import load_data_split
 from models.cnn import Net
 
-# device is set at module level, all functions use this
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using {'GPU' if device.type == 'cuda' else 'CPU'} for training")
 
 
 def train(net, train_dataloader, epochs, lr):
+
+    # device is set at module level, all functions use this
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using {'GPU' if device.type == 'cuda' else 'CPU'} for training")
+
     """Train the model on the training set."""
     criterion = torch.nn.CrossEntropyLoss()
     # SGD used over Adam, because Federated Averaging averages model weights across clients.
@@ -34,6 +36,9 @@ def train(net, train_dataloader, epochs, lr):
 
 def validate(net, val_dataloader):
     """Evaluate the model on the validation set."""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    net.to(device)
+    
     criterion = torch.nn.CrossEntropyLoss()
     correct, loss = 0, 0.0
 
@@ -58,12 +63,12 @@ if __name__ == "__main__":
 
     # Sanity check: local training for partition 0.
     PARTITION_ID = 0
-    EPOCHS = 10
+    EPOCHS = 1000
     LR = 0.01
     BATCH_SIZE = 32
 
     train_loader, val_loader = load_data_split(PARTITION_ID, BATCH_SIZE)
-
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     net = Net().to(device)
 
     for epoch in range(EPOCHS):

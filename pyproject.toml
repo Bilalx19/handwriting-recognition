@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "handwriting-recognition"
+version = "1.1.1"
+description = "Federated handwriting recognition"
+license = {file = "LICENSE"}
+dependencies = [
+    "flwr[simulation]>=1.28.0",
+    "flwr-datasets[vision]>=0.6.0",
+    "torch==2.8.0",
+    "torchvision==0.23.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.flwr.app]
+publisher = "flwrlabs"
+fab-format-version = 1
+flwr-version-target = "1.29.0"
+
+[tool.flwr.app.components]
+serverapp = "FL.fl_server:app"
+clientapp = "FL.fl_client:app"
+
+[tool.flwr.app.config]
+num-server-rounds = 50
+fraction-evaluate = 0.5
+local-epochs = 5
+learning-rate = 0.01
+batch-size = 256

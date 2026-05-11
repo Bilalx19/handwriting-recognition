@@ -4,6 +4,20 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as T
 import torch
 
+fds = None
+
+
+def get_fds():
+    global fds
+    if fds is None:
+        fds = FederatedDataset(
+            dataset="flwrlabs/femnist",
+            partitioners={
+                "train": NaturalIdPartitioner(partition_by="writer_id")
+            },
+        )
+    return fds
+
 
 # describe transform operation on img
 _transform = T.Compose([
@@ -19,26 +33,6 @@ def _img_to_tensor(batch):
     batch["image"] = images
     return batch
 
-
-def load_data(partition_id, batch_size):
-    #get dataset partition
-    fds = FederatedDataset(
-        dataset="flwrlabs/femnist",
-        partitioners={"train": NaturalIdPartitioner(partition_by="writer_id")}
-    )
-    partition = fds.load_partition(partition_id=partition_id)
-
-    #apply on partition
-    partition = partition.with_transform(_img_to_tensor)
-
-    #feed transformed partition in dataloader and return it
-    dataloader = DataLoader(
-        partition,
-        batch_size=batch_size,
-        shuffle=True
-    )
-
-    return dataloader
 
 def train_val_split(partition, val_split=0.2, batch_size=32):
     # get number of samples in partition
@@ -62,10 +56,7 @@ def train_val_split(partition, val_split=0.2, batch_size=32):
 
 def load_data_split(partition_id, batch_size):
     # load the raw partition for this client
-    fds = FederatedDataset(
-        dataset="flwrlabs/femnist",
-        partitioners={"train": NaturalIdPartitioner(partition_by="writer_id")}
-    )
+    fds = get_fds()
     partition = fds.load_partition(partition_id=partition_id)
 
     # apply on partition
