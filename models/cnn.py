@@ -5,18 +5,37 @@ class Net(nn.Module):
     """Convolutional Neural Network for FEMNIST handwriting recognition."""
 
     def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 5) # 1 input channel for grayscale images
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 4 * 4, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 62) # 62 classes in FEMNIST
+        # STRONGER CNN that ChatGPT gave me (higher accuracy)
+        super().__init__()
+
+        self.features = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, padding=1),
+            nn.GroupNorm(8, 32),
+            nn.ReLU(),
+
+            nn.Conv2d(32, 32, kernel_size=3, padding=1),
+            nn.GroupNorm(8, 32),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 28 -> 14
+
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.GroupNorm(8, 64),
+            nn.ReLU(),
+
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.GroupNorm(8, 64),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 14 -> 7
+        )
+
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(64 * 7 * 7, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 62),
+        )
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 4 * 4)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        return self.fc3(x)
+        x = self.features(x)
+        return self.classifier(x)

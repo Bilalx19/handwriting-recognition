@@ -17,7 +17,7 @@ def train(net, train_dataloader, epochs, lr):
     # Adam maintains internal state (momentum, variance) that is not averaged across clients,
     # which can lead to divergence in training. SGD has no such state and is fully compatible
     # with federated averaging.
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+    optimizer = torch.optim.AdamW(net.parameters(), lr=lr, weight_decay=1e-4)
 
     net.train()
     running_loss = 0.0
@@ -63,9 +63,9 @@ if __name__ == "__main__":
 
     # Sanity check: local training for partition 0.
     PARTITION_ID = 0
-    EPOCHS = 1000
-    LR = 0.01
-    BATCH_SIZE = 32
+    EPOCHS = 50
+    LR = 0.002
+    BATCH_SIZE = 512
 
     train_loader, val_loader = load_data_split(PARTITION_ID, BATCH_SIZE)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

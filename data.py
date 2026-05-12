@@ -13,7 +13,7 @@ def get_fds():
         fds = FederatedDataset(
             dataset="flwrlabs/femnist",
             partitioners={
-                "train": NaturalIdPartitioner(partition_by="writer_id")
+                "train": NaturalIdPartitioner(partition_by="hsf_id")
             },
         )
     return fds

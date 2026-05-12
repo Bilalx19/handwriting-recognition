@@ -27,8 +27,8 @@ serverapp = "FL.fl_server:app"
 clientapp = "FL.fl_client:app"
 
 [tool.flwr.app.config]
-num-server-rounds = 50
-fraction-evaluate = 0.5
-local-epochs = 5
-learning-rate = 0.01
-batch-size = 256
+num-server-rounds = 70
+local-epochs = 1
+learning-rate = 0.001
+batch-size = 512
+fraction-evaluate = 1.0
