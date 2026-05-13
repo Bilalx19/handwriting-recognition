@@ -1,6 +1,7 @@
 from torch import nn
 import torch.nn.functional as F
 
+
 class Net(nn.Module):
     """Convolutional Neural Network for FEMNIST handwriting recognition."""
 
