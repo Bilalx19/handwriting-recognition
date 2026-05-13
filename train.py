@@ -62,16 +62,18 @@ if __name__ == "__main__":
     # print(dataset_partition) 
 
     # Sanity check: local training for partition 0.
-    PARTITION_ID = 0
-    EPOCHS = 50
-    LR = 0.002
-    BATCH_SIZE = 512
+    partitions_ids = [0, 1, 2, 3, 4, 5] # for testing, just train on five partitions
+    EPOCHS = 100
+    LR = 0.01
+    BATCH_SIZE = 32
 
-    train_loader, val_loader = load_data_split(PARTITION_ID, BATCH_SIZE)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    for partition_id in partitions_ids:
+        print(f"Training on partition {partition_id}...")
+    train_loader, val_loader = load_data_split(partitions_ids[partition_id], BATCH_SIZE)
+
     net = Net().to(device)
 
     for epoch in range(EPOCHS):
         train_loss = train(net, train_loader, epochs=1, lr=LR)
         val_loss, val_accuracy = validate(net, val_loader)
-        print(f"Epoch {epoch + 1}/{EPOCHS} — train loss: {train_loss:.4f} | val loss: {val_loss:.4f} | val accuracy: {val_accuracy:.4f}")
+        print(f"Epoch {epoch + 1}/{EPOCHS} — train loss: {train_loss:.4f} | val loss: {val_loss:.8f} | val accuracy: {val_accuracy:.8f}")

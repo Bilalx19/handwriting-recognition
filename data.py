@@ -6,7 +6,6 @@ import torch
 
 fds = None
 
-
 def get_fds():
     global fds
     if fds is None:
@@ -18,49 +17,96 @@ def get_fds():
         )
     return fds
 
-
-# describe transform operation on img
-_transform = T.Compose([
+# ÄNDERUNG 1: Data Augmentation für Training 
+# Transform für Training (mit Augmentation)
+_transform_train = T.Compose([
+    T.RandomRotation(degrees=10),                    # leichte Rotation (±10°)
+    T.RandomAffine(degrees=0, translate=(0.05, 0.05)),  # leichte Verschiebung
+    T.RandomResizedCrop(size=(28, 28), scale=(0.9, 1.0)),  # leichter Zoom/Crop
     T.PILToTensor(),
-    T.ConvertImageDtype(torch.float32)
+    T.ConvertImageDtype(torch.float32),
 ])
 
-# apply transform on all PIL in input batch
-def _img_to_tensor(batch):
+# Transform für Validation/Test (nur Standard)
+_transform_val = T.Compose([
+    T.PILToTensor(),
+    T.ConvertImageDtype(torch.float32),
+])
+
+# ÄNDERUNG 2: Zwei separate Transform-Funktionen ==========
+def _img_to_tensor_train(batch):
+    """Für Training mit Data Augmentation"""
     images = []
     for img in batch["image"]:
-        images.append(_transform(img))
+        images.append(_transform_train(img))
     batch["image"] = images
     return batch
 
+def _img_to_tensor_val(batch):
+    """Für Validation ohne Augmentation"""
+    images = []
+    for img in batch["image"]:
+        images.append(_transform_val(img))
+    batch["image"] = images
+    return batch
 
-def train_val_split(partition, val_split=0.2, batch_size=32):
-    # get number of samples in partition
+# ÄNDERUNG 3: train_val_split mit optionaler Augmentation ==========
+def train_val_split(partition, val_split=0.2, batch_size=32, use_augmentation=True):
+    """
+    Split partition into train/val and create dataloaders.
+    
+    Args:
+        partition: Dataset partition
+        val_split: Validation split ratio
+        batch_size: Batch size for dataloaders
+        use_augmentation: If True, apply data augmentation to training set
+    """
+    # Split partition
     num_samples = len(partition)
-
-    # calculate number of samples for validation set
-    num_val_samples = int(num_samples * val_split) # 20%
-    num_train_samples = num_samples - num_val_samples # 80%
-
-    # split partition into train and validation sets
+    num_val_samples = int(num_samples * val_split)
     partition = partition.train_test_split(test_size=num_val_samples, seed=42)
-
-    # TODO: what does this mean for how many clients we will have?
-    # wrap train and validation in dataloaders and return
-    # for 3597 writers and 814277 samples, each partition will have roughly 226 samples,
-    # meaning for batch size 32, each epoch will have ~6 batches in train and ~2 batches in val
+    
+    # ÄNDERUNG 4: Unterschiedliche Transforms für Train/Val ==========
+    if use_augmentation:
+        partition["train"] = partition["train"].with_transform(_img_to_tensor_train)
+        print(f"✅ Data Augmentation aktiviert für Training")
+    else:
+        partition["train"] = partition["train"].with_transform(_img_to_tensor_val)
+        print(f"⚠️ Data Augmentation DEAKTIVIERT für Training")
+    
+    partition["test"] = partition["test"].with_transform(_img_to_tensor_val)
+    
+    # Create dataloaders
     train_dataloader = DataLoader(partition["train"], batch_size=batch_size, shuffle=True)
     val_dataloader = DataLoader(partition["test"], batch_size=batch_size, shuffle=False)
-
+    
     return train_dataloader, val_dataloader
 
-def load_data_split(partition_id, batch_size):
-    # load the raw partition for this client
+# ÄNDERUNG 5: load_data_split mit Augmentation-Parameter ==========
+def load_data_split(partition_id, batch_size, use_augmentation=True):
+    """
+    Load data for a client partition.
+    
+    Args:
+        partition_id: Client partition ID
+        batch_size: Batch size
+        use_augmentation: If True, apply data augmentation to training set
+    """
     fds = get_fds()
     partition = fds.load_partition(partition_id=partition_id)
+    
+    return train_val_split(partition, batch_size=batch_size, use_augmentation=use_augmentation)
 
-    # apply on partition
-    partition = partition.with_transform(_img_to_tensor)
 
-    # delegate splitting and dataloader creation to train_val_split
-    return train_val_split(partition, batch_size=batch_size)
+"""
+# Fortgeschrittene Data Augmentation
+_transform_train = T.Compose([
+    T.RandomRotation(degrees=15),                    # stärkere Rotation
+    T.RandomAffine(degrees=0, translate=(0.1, 0.1)),  # stärkere Verschiebung
+    T.RandomResizedCrop(size=(28, 28), scale=(0.8, 1.0)),
+    T.RandomHorizontalFlip(p=0.3),                   # horizontales Spiegeln (30%)
+    T.ColorJitter(brightness=0.2, contrast=0.2),     # Helligkeits-/Kontrastvariation
+    T.PILToTensor(),
+    T.ConvertImageDtype(torch.float32),
+])
+"""
