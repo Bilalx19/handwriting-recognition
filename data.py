@@ -20,8 +20,8 @@ def get_fds():
 # ÄNDERUNG 1: Data Augmentation für Training 
 # Transform für Training (mit Augmentation)
 _transform_train = T.Compose([
-    T.RandomRotation(degrees=10),                    # leichte Rotation (±10°)
-    T.RandomAffine(degrees=0, translate=(0.05, 0.05)),  # leichte Verschiebung
+    T.RandomRotation(degrees=10),                    # leichte Rotation (+-10°)
+    T.RandomAffine(degrees=0, translate=(0.05, 0.05)),  # leichte Verschiwbung
     T.RandomResizedCrop(size=(28, 28), scale=(0.9, 1.0)),  # leichter Zoom/Crop
     T.PILToTensor(),
     T.ConvertImageDtype(torch.float32),
@@ -69,10 +69,10 @@ def train_val_split(partition, val_split=0.2, batch_size=32, use_augmentation=Tr
     # ÄNDERUNG 4: Unterschiedliche Transforms für Train/Val ==========
     if use_augmentation:
         partition["train"] = partition["train"].with_transform(_img_to_tensor_train)
-        print(f"✅ Data Augmentation aktiviert für Training")
+        print(f"Data Augmentation aktiviert für Training")
     else:
         partition["train"] = partition["train"].with_transform(_img_to_tensor_val)
-        print(f"⚠️ Data Augmentation DEAKTIVIERT für Training")
+        print(f"Data Augmentation DEAKTIVIERT für Training")
     
     partition["test"] = partition["test"].with_transform(_img_to_tensor_val)
     

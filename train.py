@@ -3,7 +3,7 @@ import torch
 from data import load_data_split
 from models.cnn import Net
 
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def train(net, train_dataloader, epochs, lr):
 
