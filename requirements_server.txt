@@ -1,0 +1,5 @@
+# Here are the dependencies for the server Docker image defined
+
+torch==2.12.0
+flwr==1.30.0
+numpy==2.4.6

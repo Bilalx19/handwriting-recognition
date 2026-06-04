@@ -23,6 +23,10 @@ In the following the sources are listed which were used while the containerizati
 
 - https://www.datacamp.com/tutorial/docker-tutorial (Source 1)
 - https://depot.dev/blog/docker-build-image#what-is-docker (Source 2)
+- https://medium.com/@mukeshsharma20120/building-a-real-world-multi-container-docker-application-complete-guide-c38e5d649feb (Source 3)
+
+others:
+- https://stackoverflow.com/questions/29835905/docker-compose-using-multiple-dockerfiles-for-multiple-services
 
 - https://youtu.be/DQdB7wFEygo?si=QYfeu4HelSzoWWNO (brainrot explanation)
 
@@ -30,12 +34,17 @@ In the following the sources are listed which were used while the containerizati
 ### Basic knowledge:
 
 Docker Images (Recipe) -> Contains the fundamental building blocks of containers. They are built in the Dockerfile. 
+Golden Rule of Containers -> One Container should do one Job only
 
 ## Building a container:
 DO:
 docker build -t handwriting-app .
 this builds a container (we only need one first for testing)
 this takes apperantly few minutes
+
+TO BUILD only one Container, for example the client.Dockerfile do: docker build -f client.Dockerfile -t handwriting-client .
+TO check whats in the Container, for example for client then do: docker run --rm -it handwriting-client ls -la
+
 
 ## RUN
 RUN it trough command: 

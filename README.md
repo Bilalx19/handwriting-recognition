@@ -23,7 +23,7 @@ streamlit
 streamlit_drawable_canvas
 plotly
 pandas
-flwr-datasets[vision] ## not needed for the app User (docker part)???
+flwr-datasets[vision] ## not needed for the app User (docker part)??? ! update 04.06.2026 -> its needed !
 
 To check the versions of them all do:
 

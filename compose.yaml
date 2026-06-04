@@ -1,3 +1,7 @@
+# created with docker --init
+# to run docker compose do: docker-compose -f compose.yaml up
+
+
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Docker Compose reference guide at
 # https://docs.docker.com/go/compose-spec-reference/
@@ -11,12 +15,45 @@ services:
   app:
     build:
       context: .
-      target: final
+      dockerfile: app.Dockerfile
+    container_name: handwriting-app
     # If your application exposes a port, uncomment the following lines and change
     # the port numbers as needed. The first number is the host port and the second
     # is the port inside the container.
-    # ports:
-    #   - 8080:8080
+    ports:
+      - "8501:8501"
+    
+  server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    container_name: handwriting-server
+    ports:
+      - "8080:8080"
+    networks:
+      - fl_network
+    environment:
+      - PYTHONBUFFERED=1
+    volumes:
+      - ./models:/app/models
+
+  client:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=0
+      - SERVER_ADDRESS=server:8080
+
+networks:
+  fl_network:
+    driver: bridge    
 
     # The commented out section below is an example of how to define a PostgreSQL
     # database that your application can use. `depends_on` tells Docker Compose to
