@@ -1,0 +1,16 @@
+## Here the dependencies for the project are going to be listed
+
+## I will write the dependencies like this one here: https://github.com/docker/python-docker/blob/main/requirements.txt
+
+## listed everything what needed to be installed (went trough all files)
+
+torch==2.12.0
+torchvision==0.27.0
+flwr==1.30.0
+numpy==2.4.6
+pillow==12.2.0
+streamlit==1.57.0
+streamlit_drawable_canvas==0.9.3
+plotly==6.7.0
+pandas==3.0.3
+#flwr-datasets[vision] ## not needed right? Since its only used for training and testing? Not relevant for the APP User
