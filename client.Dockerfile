@@ -26,6 +26,7 @@ ENV PYTHONPATH=/app
 
 ENV PYTHONBUFFERED=1
 
+# to connect to the server we set the ENV
 ENV SERVER_ADDRESS=server:8080
 
 CMD ["python", "-m", "FL.fl_client"]

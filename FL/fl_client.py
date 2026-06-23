@@ -9,6 +9,8 @@ from train import train as train_fn
 from train import validate as test_fn
 from data import load_data_split
 
+import os # to get the ENV for the partition id
+
 # Flower ClientApp
 app = ClientApp()
 
@@ -24,7 +26,11 @@ def train(msg: Message, context: Context):
     model.to(device)
 
     # Load the data
-    partition_id = context.node_config["partition-id"]
+    #partition_id = context.node_config["partition-id"]
+
+    # get the ENV and Load the DATA with it
+    partition_id = int(os.getenv("PARTITION_ID", "0")) # default is 0 if its not set trough the compose commmand
+
     num_partitions = context.node_config["num-partitions"]
     batch_size = context.run_config["batch-size"]
     trainloader, _ = load_data_split(partition_id, batch_size)

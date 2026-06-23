@@ -18,6 +18,9 @@ RUN pip install --no-cache-dir -r requirements_server.txt
 
 COPY FL/fl_server.py ./FL/
 
+COPY  final_model.pt ./final_model.pt
+# server has the final model
+
 COPY models/cnn.py ./models/
 
 ENV PYTHONPATH=/app

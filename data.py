@@ -59,6 +59,8 @@ def load_data_split(partition_id, batch_size):
     fds = get_fds()
     partition = fds.load_partition(partition_id=partition_id)
 
+    print(f"The client{partition_id} has {len(partition)} samples.")
+
     # apply on partition
     partition = partition.with_transform(_img_to_tensor)
 

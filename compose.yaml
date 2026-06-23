@@ -1,6 +1,14 @@
 # created with docker --init
-# to run docker compose do: docker-compose -f compose.yaml up
+# to run docker compose (all services) do: docker-compose -f compose.yaml up
 
+# according to source: https://stackoverflow.com/questions/30233105/docker-compose-up-for-only-certain-containers
+# to run docker compose (specific service only) do: docker compose -f compose.yaml up xxxxxx
+# for example: docker compose -f compose.yaml up app
+
+# to stop all services do: docker compose stop
+
+# to check which services are running do: docker ps
+# to check which services are running and which are not running do: docker ps -a
 
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Docker Compose reference guide at
@@ -37,11 +45,11 @@ services:
     volumes:
       - ./models:/app/models
 
-  client:
+  client0:
     build:
       context: .
       dockerfile: client.Dockerfile
-    container_name: handwriting-client
+    container_name: handwriting-client_0
     networks:
       - fl_network
     depends_on:
@@ -49,6 +57,104 @@ services:
     environment:
       - PYTHONBUFFERED=1
       - PARTITION_ID=0
+      - SERVER_ADDRESS=server:8080
+    
+  client1:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client_1
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=1
+      - SERVER_ADDRESS=server:8080
+  
+  client2:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client_2
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=2
+      - SERVER_ADDRESS=server:8080
+  
+  client3:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client_3
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=3
+      - SERVER_ADDRESS=server:8080
+  
+  client4:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client_4
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=4
+      - SERVER_ADDRESS=server:8080
+  
+  client5:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client_5
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=5
+      - SERVER_ADDRESS=server:8080
+  
+  client6:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client_6
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=6
+      - SERVER_ADDRESS=server:8080
+  
+  client7:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: handwriting-client_7
+    networks:
+      - fl_network
+    depends_on:
+      - server
+    environment:
+      - PYTHONBUFFERED=1
+      - PARTITION_ID=7
       - SERVER_ADDRESS=server:8080
 
 networks:
