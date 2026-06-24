@@ -82,7 +82,7 @@ CLASSES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 @st.cache_resource
 def load_model():
     model = Net()
-    model.load_state_dict(torch.load("final_model.pt", map_location="cpu"))
+    model.load_state_dict(torch.load("global_model/final_model.pt", map_location="cpu"))
     model.eval()
     return model
 

@@ -6,6 +6,7 @@
 # for example: docker compose -f compose.yaml up app
 
 # to stop all services do: docker compose stop
+# to remove a service do: docker compose -f compose.yaml rm -f xxxxxx
 
 # to check which services are running do: docker ps
 # to check which services are running and which are not running do: docker ps -a
@@ -30,6 +31,8 @@ services:
     # is the port inside the container.
     ports:
       - "8501:8501"
+    volumes:
+      - ./global_model:/app/global_model
     
   server:
     build:
@@ -43,7 +46,9 @@ services:
     environment:
       - PYTHONBUFFERED=1
     volumes:
-      - ./models:/app/models
+      - ./global_model:/app/global_model
+    #volumes:
+    #  - ./models:/app/models
 
   client0:
     build:

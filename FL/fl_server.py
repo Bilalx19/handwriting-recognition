@@ -4,8 +4,9 @@ import torch
 from flwr.app import ArrayRecord, ConfigRecord, Context
 from flwr.serverapp import Grid, ServerApp
 from flwr.serverapp.strategy import FedAvg
-
 from models.cnn import Net
+
+
 
 # Create ServerApp
 app = ServerApp()
@@ -44,4 +45,4 @@ def main(grid: Grid, context: Context) -> None:
     state_dict = final_arrays.to_torch_state_dict()
     print("Saved keys:", state_dict.keys())
 
-    torch.save(state_dict, "final_model.pt")
+    torch.save(state_dict, "global_model/final_model.pt")

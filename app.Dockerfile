@@ -21,7 +21,7 @@ COPY UI/ ./UI/
 
 COPY models/ ./models/
 
-COPY final_model.pt ./final_model.pt
+#COPY final_model.pt ./final_model.pt
 # Not needed here? Because it should only be in server???? Because the app should be dependent on the server where the global model is stored and can be accessed??
 
 ENV PYTHONBUFFERED=1
