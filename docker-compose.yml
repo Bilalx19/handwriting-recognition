@@ -1,0 +1,90 @@
+services:
+  superlink:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fl-superlink
+    working_dir: /app
+    command:
+      - flower-superlink
+      - --insecure
+      - --fleet-api-address
+      - 0.0.0.0:9092
+      - --control-api-address
+      - 0.0.0.0:9093
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 9092)); s.close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fl-server
+    working_dir: /app
+    environment:
+      HF_HOME: /tmp/huggingface
+    command:
+      - flwr
+      - run
+      - .
+      - local-deployment
+      - --stream
+    depends_on:
+      superlink:
+        condition: service_healthy
+    volumes:
+      - server_state:/app/output
+
+  client1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fl-client-1
+    working_dir: /app
+    environment:
+      HF_HOME: /tmp/huggingface
+    command:
+      - flower-supernode
+      - --insecure
+      - --superlink
+      - superlink:9092
+      - --clientappio-api-address
+      - 0.0.0.0:9094
+      - --node-config
+      - partition-id=0 num-partitions=8
+    depends_on:
+      superlink:
+        condition: service_healthy
+
+  client2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fl-client-2
+    working_dir: /app
+    environment:
+      HF_HOME: /tmp/huggingface
+    command:
+      - flower-supernode
+      - --insecure
+      - --superlink
+      - superlink:9092
+      - --clientappio-api-address
+      - 0.0.0.0:9095
+      - --node-config
+      - partition-id=1 num-partitions=8
+    depends_on:
+      superlink:
+        condition: service_healthy
+
+  
+
+volumes:
+  server_state:
