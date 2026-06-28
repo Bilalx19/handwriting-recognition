@@ -21,6 +21,9 @@ services:
       timeout: 3s
       retries: 20
       start_period: 5s
+    volumes:
+      - model_data:/app/model
+      - metrics:/app/metrics
 
   server:
     build:
@@ -40,7 +43,8 @@ services:
       superlink:
         condition: service_healthy
     volumes:
-      - server_state:/app/output
+      - model_data:/app/model
+      - metrics:/app/metrics
 
   client1:
     build:
@@ -58,10 +62,13 @@ services:
       - --clientappio-api-address
       - 0.0.0.0:9094
       - --node-config
-      - partition-id=0 num-partitions=8
+      - partition-id=0 num-partitions=4
     depends_on:
       superlink:
         condition: service_healthy
+    volumes:
+      - metrics:/app/metrics
+      - hf_cache:/tmp/huggingface
 
   client2:
     build:
@@ -79,12 +86,63 @@ services:
       - --clientappio-api-address
       - 0.0.0.0:9095
       - --node-config
-      - partition-id=1 num-partitions=8
+      - partition-id=1 num-partitions=4
     depends_on:
       superlink:
         condition: service_healthy
+    volumes:
+      - metrics:/app/metrics
+      - hf_cache:/tmp/huggingface
 
-  
+  client3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fl-client-3
+    working_dir: /app
+    environment:
+      HF_HOME: /tmp/huggingface
+    command:
+      - flower-supernode
+      - --insecure
+      - --superlink
+      - superlink:9092
+      - --clientappio-api-address
+      - 0.0.0.0:9096
+      - --node-config
+      - partition-id=2 num-partitions=4
+    depends_on:
+      superlink:
+        condition: service_healthy
+    volumes:
+      - metrics:/app/metrics
+      - hf_cache:/tmp/huggingface
+
+  client4:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fl-client-4
+    working_dir: /app
+    environment:
+      HF_HOME: /tmp/huggingface
+    command:
+      - flower-supernode
+      - --insecure
+      - --superlink
+      - superlink:9092
+      - --clientappio-api-address
+      - 0.0.0.0:9097
+      - --node-config
+      - partition-id=3 num-partitions=4
+    depends_on:
+      superlink:
+        condition: service_healthy
+    volumes:
+      - metrics:/app/metrics
+      - hf_cache:/tmp/huggingface
 
 volumes:
-  server_state:
+  model_data:
+  metrics:
+  hf_cache:
