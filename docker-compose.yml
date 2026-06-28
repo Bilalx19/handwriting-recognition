@@ -142,6 +142,78 @@ services:
       - metrics:/app/metrics
       - hf_cache:/tmp/huggingface
 
+  dashboard:
+    build:
+      context: dashboard
+      dockerfile: Dockerfile
+    container_name: fl-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - metrics:/app/metrics:ro
+      - model_data:/app/model:ro
+    restart: unless-stopped
+
+  client0-dashboard:
+    build:
+      context: dashboard
+      dockerfile: Dockerfile
+    container_name: fl-client0-dashboard
+    command: ["streamlit", "run", "client_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    environment:
+      CLIENT_ID: "0"
+    ports:
+      - "8502:8501"
+    volumes:
+      - metrics:/app/metrics:ro
+      - model_data:/app/model:ro
+    restart: unless-stopped
+
+  client1-dashboard:
+    build:
+      context: dashboard
+      dockerfile: Dockerfile
+    container_name: fl-client1-dashboard
+    command: ["streamlit", "run", "client_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    environment:
+      CLIENT_ID: "1"
+    ports:
+      - "8503:8501"
+    volumes:
+      - metrics:/app/metrics:ro
+      - model_data:/app/model:ro
+    restart: unless-stopped
+
+  client2-dashboard:
+    build:
+      context: dashboard
+      dockerfile: Dockerfile
+    container_name: fl-client2-dashboard
+    command: ["streamlit", "run", "client_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    environment:
+      CLIENT_ID: "2"
+    ports:
+      - "8504:8501"
+    volumes:
+      - metrics:/app/metrics:ro
+      - model_data:/app/model:ro
+    restart: unless-stopped
+
+  client3-dashboard:
+    build:
+      context: dashboard
+      dockerfile: Dockerfile
+    container_name: fl-client3-dashboard
+    command: ["streamlit", "run", "client_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    environment:
+      CLIENT_ID: "3"
+    ports:
+      - "8505:8501"
+    volumes:
+      - metrics:/app/metrics:ro
+      - model_data:/app/model:ro
+    restart: unless-stopped
+
 volumes:
   model_data:
   metrics:
