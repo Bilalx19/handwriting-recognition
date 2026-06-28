@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: superexec-clientapp-3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: superexec-clientapp-3
+  template:
+    metadata:
+      labels:
+        app: superexec-clientapp-3
+    spec:
+      containers:
+      - name: superexec-clientapp
+        # TODO Sobald wir in google Cloud ein Projekt haben und alles konfiguiert  <YOUR_PROJECT_ID> mit den project identifier ersetzen
+        image: us-central1-docker.pkg.dev/<YOUR_PROJECT_ID>/flower-gcp-example-artifacts/quickstart_numpy_superexec:0.0.1
+        args:
+          - "--insecure"
+          - "--appio-api-address"
+          - "supernode-3-service:9094"
+          - "--plugin-type"
+          - "clientapp"
+---
