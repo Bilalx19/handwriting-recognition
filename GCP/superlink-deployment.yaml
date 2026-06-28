@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: superlink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: superlink
+  template:
+    metadata:
+      labels:
+        app: superlink
+    spec:
+      containers:
+      - name: superlink
+        image: flwr/superlink:1.33.0 #TODO prüfen ob es keine Probleme gibt weil image 1.31.0 nutzt
+        args:
+          - "--insecure"
+          - "--isolation"
+          - "process"
+        ports:  # Welche Ports im Container verfügbar sind
+        - containerPort: 9091
+        - containerPort: 9092
+        - containerPort: 9093
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: superlink-service
+spec:
+  selector:
+    app: superlink
+  ports:  # Port-Weiterleitung für den externen Zugriff
+  - protocol: TCP
+    port: 9091   # Port für ServerApp Verbindung
+    targetPort: 9091  # Ziel-Port im SuperLink Container
+    name: superlink-serverappioapi
+  - protocol: TCP
+    port: 9092   # Port für SuperNode Verbindung
+    targetPort: 9092  # Ziel-Port im SuperLink Container
+    name: superlink-fleetapi
+  - protocol: TCP
+    port: 9093   # Port für Flower App Übermittlung
+    targetPort: 9093  # Ziel-Port im SuperLink Container
+    name: superlink-controlapi
+  type: LoadBalancer  # Stellt den Service öffentlich bereit und verteilt die Last

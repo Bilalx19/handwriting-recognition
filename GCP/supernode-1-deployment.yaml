@@ -1,0 +1,41 @@
+# Definiert eine Bereitstellung für einen SuperNode im Flower-Netzwerk
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supernode-1  # Eindeutiger Name für diesen SuperNode
+spec:
+  replicas: 1  # Wir brauchen nur eine Instanz dieses SuperNodes
+  selector:
+    matchLabels:
+      app: supernode-1  # Wählt alle Pods mit diesem Label aus
+  template:
+    metadata:
+      labels:
+        app: supernode-1  # Label für die Pod-Identifikation
+    spec:
+      containers:
+      - name: supernode
+        image: flwr/supernode:1.33.0  # Offizielles Flower-Image für SuperNodes
+        args:
+          - "--insecure"  
+          - "--superlink"  # Gibt die SuperLink-Instantz an, zu der dieser Node verbindet
+          - "superlink-service:9092"  # Adresse des SuperLink-Services (Hostname:Port)
+          - "--clientappio-api-address"  # Eigene API-Adresse für ClientApp-Kommunikation
+          - "0.0.0.0:9094"  # Hört auf allen Netzwerkschnittstellen auf Port 9094
+          - "--isolation"  # Legt die Isolationsart für den Node fest
+          - "process"  # Jeder Client läuft in einem eigenen Prozesss
+        ports:
+        - containerPort: 9094  # Der Port, den der Container für eingehende Verbindungen öffnet
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: supernode-1-service  
+spec:
+  selector:
+    app: supernode-1  
+  ports:
+  - protocol: TCP  
+    port: 9094  # Der Port, auf dem der Service erreichbar ist
+    targetPort: 9094  # Der Port im Container an den weitergeleitet wird
