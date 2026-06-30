@@ -13,10 +13,8 @@ def train(net, train_dataloader, epochs, lr):
 
     """Train the model on the training set."""
     criterion = torch.nn.CrossEntropyLoss()
-    # SGD used over Adam, because Federated Averaging averages model weights across clients.
-    # Adam maintains internal state (momentum, variance) that is not averaged across clients,
-    # which can lead to divergence in training. SGD has no such state and is fully compatible
-    # with federated averaging.
+    # AdamW with a fresh optimizer each round: no cross-round momentum state,
+    # so FedAvg weight averaging is unaffected.
     optimizer = torch.optim.AdamW(net.parameters(), lr=lr, weight_decay=1e-4)
 
     net.train()

@@ -1,5 +1,5 @@
 from flwr_datasets import FederatedDataset
-from flwr_datasets.partitioner import NaturalIdPartitioner
+from flwr_datasets.partitioner import IidPartitioner
 from torch.utils.data import DataLoader
 import torchvision.transforms as T
 import torch
@@ -13,7 +13,7 @@ def get_fds():
         fds = FederatedDataset(
             dataset="flwrlabs/femnist",
             partitioners={
-                "train": NaturalIdPartitioner(partition_by="hsf_id")
+                "train": IidPartitioner(num_partitions=4)
             },
         )
     return fds
@@ -45,10 +45,6 @@ def train_val_split(partition, val_split=0.2, batch_size=32):
     # split partition into train and validation sets
     partition = partition.train_test_split(test_size=num_val_samples, seed=42)
 
-    # TODO: what does this mean for how many clients we will have?
-    # wrap train and validation in dataloaders and return
-    # for 3597 writers and 814277 samples, each partition will have roughly 226 samples,
-    # meaning for batch size 32, each epoch will have ~6 batches in train and ~2 batches in val
     train_dataloader = DataLoader(partition["train"], batch_size=batch_size, shuffle=True)
     val_dataloader = DataLoader(partition["test"], batch_size=batch_size, shuffle=False)
 
