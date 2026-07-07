@@ -4,3 +4,7 @@ default = "local-deployment"
 [superlink.local-deployment]
 address = "superlink:9093"
 insecure = true
+
+[superlink.gcp]
+address = "<SUPERLINK_EXTERNAL_IP>:9093"
+insecure = true

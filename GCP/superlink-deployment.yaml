@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: superlink
-        image: flwr/superlink:1.33.0 #TODO prüfen ob es keine Probleme gibt weil image 1.31.0 nutzt
+        image: flwr/superlink:1.32.1  # latest stable Flower release
         args:
           - "--insecure"
           - "--isolation"

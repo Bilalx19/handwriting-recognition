@@ -21,7 +21,11 @@ COPY FL ./FL
 COPY models ./models
 COPY flower-config.toml /root/.flwr/config.toml
 
-RUN pip install --upgrade pip setuptools wheel && \
-    pip install .
+RUN pip install --upgrade pip setuptools wheel
+# flwr 1.32.1 and flwr-datasets 0.6.0 disagree on the rich version; install in separate
+# steps so pip resolves them without failing the combined resolve.
+RUN pip install "flwr[simulation]==1.32.1"
+RUN pip install "flwr-datasets[vision]==0.6.0" "torch==2.8.0" "torchvision==0.23.0"
+RUN pip install --no-deps .
 
 CMD ["python", "--version"]

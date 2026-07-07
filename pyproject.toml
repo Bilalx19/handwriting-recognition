@@ -8,7 +8,7 @@ version = "1.1.1"
 description = "Federated handwriting recognition"
 license = {file = "LICENSE"}
 dependencies = [
-    "flwr[simulation]>=1.28.0",
+    "flwr[simulation]>=1.32.1",
     "flwr-datasets[vision]>=0.6.0",
     "torch==2.8.0",
     "torchvision==0.23.0",
@@ -20,14 +20,14 @@ packages = ["."]
 [tool.flwr.app]
 publisher = "flwrlabs"
 fab-format-version = 1
-flwr-version-target = "1.29.0"
+flwr-version-target = "1.32.1"
 
 [tool.flwr.app.components]
 serverapp = "FL.fl_server:app"
 clientapp = "FL.fl_client:app"
 
 [tool.flwr.app.config]
-num-server-rounds = 20
+num-server-rounds = 3
 local-epochs = 1
 learning-rate = 0.001
 batch-size = 512

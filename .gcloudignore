@@ -1,0 +1,5 @@
+# Keep the upload to Cloud Build tiny: the superexec image only needs these files.
+*
+!superexec.Dockerfile
+!pyproject.toml
+!LICENSE

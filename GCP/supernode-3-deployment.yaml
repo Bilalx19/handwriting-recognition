@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: supernode
-        image: flwr/supernode:1.33.0
+        image: flwr/supernode:1.32.1
         args:
           - "--insecure"
           - "--superlink"
@@ -23,6 +23,8 @@ spec:
           - "0.0.0.0:9094"
           - "--isolation"
           - "process"
+          - "--node-config"
+          - "partition-id=2 num-partitions=4"
         ports:
         - containerPort: 9094
 ---

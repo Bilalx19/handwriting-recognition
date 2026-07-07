@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: supernode
-        image: flwr/supernode:1.33.0  # Offizielles Flower-Image für SuperNodes
+        image: flwr/supernode:1.32.1  # Offizielles Flower-Image für SuperNodes
         args:
           - "--insecure"  
           - "--superlink"  # Gibt die SuperLink-Instantz an, zu der dieser Node verbindet
@@ -24,6 +24,8 @@ spec:
           - "0.0.0.0:9094"  # Hört auf allen Netzwerkschnittstellen auf Port 9094
           - "--isolation"  # Legt die Isolationsart für den Node fest
           - "process"  # Jeder Client läuft in einem eigenen Prozesss
+          - "--node-config"
+          - "partition-id=0 num-partitions=4"
         ports:
         - containerPort: 9094  # Der Port, den der Container für eingehende Verbindungen öffnet
 ---

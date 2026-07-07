@@ -5,7 +5,6 @@ class Net(nn.Module):
     """Convolutional Neural Network for FEMNIST handwriting recognition."""
 
     def __init__(self):
-        # STRONGER CNN that ChatGPT gave me (higher accuracy)
         super().__init__()
 
         self.features = nn.Sequential(
