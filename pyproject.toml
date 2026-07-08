@@ -32,3 +32,9 @@ local-epochs = 1
 learning-rate = 0.001
 batch-size = 512
 fraction-evaluate = 1.0
+
+[tool.uv]
+# flwr 1.32.1 needs rich>=14 but flwr-datasets 0.6.0 needs rich<14. Pin rich to the lower
+# range (flwr 1.32.1 runs on it) so the deployment runtime's uv resolver can install the app
+# dependencies at run time.
+override-dependencies = ["rich>=13.5,<14"]
