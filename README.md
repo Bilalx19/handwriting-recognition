@@ -72,3 +72,62 @@ Save the model and delete the cluster:
     kubectl cp "$POD":/app/model/final_model.pt ./final_model.pt
     gcloud container clusters delete flower-cluster --zone us-central1-a
 
+
+# Data Augmentation
+
+Data Augmentation can be easily enabled or disabled via the `pyproject.toml` configuration file. The augmentation is applied during training without modifying the original dataset.
+
+## Configuration
+
+Open `pyproject.toml` and adjust the following settings:
+
+```
+[tool.flwr.app.config]
+# Data Augmentation
+use-augmentation = false  # true = enable | false = disable
+augmentation-type = "light"  # "light", "standard", or "pixel"
+```
+
+## Available Augmentation Types
+
+| Type | Description | Rotation | Translation | Additional Effects |
+|------|-------------|----------|-------------|-------------------|
+| **`"light"`** | Gentle augmentation for sensitive characters | ±3° | ±3% | No perspective |
+| **`"standard"`** | Balanced augmentation for more variance | ±5° | ±5% | Slight brightness adjustment |
+| **`"pixel"`** | Pixel-based changes only | 0° | 0% | Random Erasing (holes) |
+| **`"false"`** | No augmentation | - | - | - |
+
+## How to Enable Augmentation
+
+### 1. Turn on Augmentation
+
+Set in `pyproject.toml`:
+
+
+    use-augmentation = true
+
+
+### 2. Choose Augmentation Type (optional)
+
+Select one of the three types:
+
+
+    augmentation-type = "light"  # "light", "standard", or "pixel"
+
+
+### 3. Start the Simulation
+
+Run the simulation as usual:
+
+
+    flwr run . --stream
+
+## Testing Augmentation
+
+To visualize and compare the different augmentation types:
+
+```bash
+python -c "from data import test_augmentation; test_augmentation()"
+```
+
+This creates a comparison chart `augmentation_comparison.png` showing all three augmentation types.
