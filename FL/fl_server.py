@@ -11,6 +11,13 @@ from flwr.serverapp.strategy import FedAvg
 from models.cnn import Net
 
 
+
+
+#On mac works for me:
+#METRICS_FILE = Path.home() / "flower_metrics" / "server_metrics.json"
+#MODEL_FILE = Path.home() / "flower_metrics" / "final_model.pt"
+
+
 METRICS_FILE = Path("/app/metrics/server_metrics.json")
 MODEL_FILE = Path("/app/model/final_model.pt")
 

@@ -71,3 +71,4 @@ Save the model and delete the cluster:
     POD=$(kubectl get pods -l app=superexec-serverapp -o jsonpath='{.items[0].metadata.name}')
     kubectl cp "$POD":/app/model/final_model.pt ./final_model.pt
     gcloud container clusters delete flower-cluster --zone us-central1-a
+

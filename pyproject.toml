@@ -33,6 +33,8 @@ local-epochs = 1
 learning-rate = 0.001
 batch-size = 512
 fraction-evaluate = 1.0
+use-augmentation = false  # Setze auf true für Augmentation
+augmentation-type = "light"  # "light", "standard", oder "pixel"
 
 [tool.uv]
 # flwr 1.32.1 needs rich>=14 but flwr-datasets 0.6.0 needs rich<14. Pin rich to the lower

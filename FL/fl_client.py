@@ -11,11 +11,11 @@ from train import train as train_fn
 from train import validate as test_fn
 from data import load_data_split
 
-
+#TODO works on my mac better, please check this out too
+#METRICS_DIR = Path(__file__).resolve().parent.parent / "metrics" 
 METRICS_DIR = Path("/app/metrics")
 
 app = ClientApp()
-
 
 def _append_client_metric(partition_id: int, record: dict) -> None:
     path = METRICS_DIR / f"client_{partition_id}_metrics.json"
@@ -28,9 +28,9 @@ def _append_client_metric(partition_id: int, record: dict) -> None:
     with open(path, "w") as f:
         json.dump(existing, f)
 
-
 @app.train()
 def train(msg: Message, context: Context):
+    print("ENTER train")
     model = Net()
     model.load_state_dict(msg.content["arrays"].to_torch_state_dict())
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -39,7 +39,18 @@ def train(msg: Message, context: Context):
     partition_id = context.node_config["partition-id"]
     num_partitions = context.node_config["num-partitions"]
     batch_size = context.run_config["batch-size"]
-    trainloader, _ = load_data_split(partition_id, batch_size, num_partitions)
+    
+    # Lese Augmentation-Einstellungen
+    use_augmentation = context.run_config.get("use-augmentation", False)
+    augmentation_type = context.run_config.get("augmentation-type", "standard")
+    
+    # Lade DataLoader mit Augmentation
+    trainloader, _ = load_data_split(
+        partition_id, 
+        batch_size, 
+        use_augmentation=use_augmentation,
+        augmentation_type=augmentation_type
+    )
 
     train_loss = train_fn(
         model,
@@ -48,11 +59,15 @@ def train(msg: Message, context: Context):
         msg.content["config"].get("lr", context.run_config["learning-rate"]),
     )
 
+    print(f"DATA loaded (Aug: {'ON' if use_augmentation else 'OFF'}, Type: {augmentation_type})")
+
     _append_client_metric(int(partition_id), {
         "type": "train",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "train_loss": float(train_loss),
         "num_examples": len(trainloader.dataset),
+        "use_augmentation": use_augmentation,
+        "augmentation_type": augmentation_type,
     })
 
     model_record = ArrayRecord(model.state_dict())
@@ -62,8 +77,8 @@ def train(msg: Message, context: Context):
     }
     metric_record = MetricRecord(metrics)
     content = RecordDict({"arrays": model_record, "metrics": metric_record})
+    print("TRAIN finished")
     return Message(content=content, reply_to=msg)
-
 
 @app.evaluate()
 def evaluate(msg: Message, context: Context):
@@ -75,7 +90,11 @@ def evaluate(msg: Message, context: Context):
     partition_id = context.node_config["partition-id"]
     num_partitions = context.node_config["num-partitions"]
     batch_size = context.run_config["batch-size"]
-    _, valloader = load_data_split(partition_id, batch_size, num_partitions)
+    _, valloader = load_data_split(
+        partition_id, 
+        batch_size, 
+        use_augmentation=False  # Val immer ohne Augmentation
+    )
 
     eval_loss, eval_acc = test_fn(model, valloader)
 
